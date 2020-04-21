@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     post 'getMeetings', to: 'bigbluebutton_api#get_meetings', as: :get_meetings
     post 'create', to: 'bigbluebutton_api#create', as: :create
     post 'end', to: 'bigbluebutton_api#end'
-    post 'join', to: 'bigbluebutton_api#join'
+    get 'join', to: 'bigbluebutton_api#join'
     post 'getRecordings', to: 'bigbluebutton_api#get_recordings', as: :get_recordings
     post 'publishRecordings', to: 'bigbluebutton_api#publish_recordings', as: :publish_recordings
     post 'updateRecordings', to: 'bigbluebutton_api#update_recordings', as: :update_recordings

@@ -39,7 +39,7 @@ namespace :poll do
         users = count.present? ? count.text.to_i : 0
         total_user_count += users
       end
-      server.load = total_user_count
+      server.load = total_user_count + meetings.length
       server.online = true
     rescue StandardError => e
       Rails.logger.warn("Failed to get server id=#{server.id} status: #{e}")

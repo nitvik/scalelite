@@ -147,6 +147,9 @@ class BigBlueButtonApiController < ApplicationController
     # Update with old server if meeting already existed in database
     server = meeting.server
 
+    logger.debug("Incrementing server #{server.id} load by 1")
+    server.increment_load(1)
+
     duration = params[:duration].to_i
 
     # Set/Overite duration if MAX_MEETING_DURATION is set and it's greater than params[:duration] (if passed)

@@ -361,6 +361,105 @@ class BigBlueButtonApiController < ApplicationController
     render(:delete_recordings)
   end
 
+  def hooks_create
+      params.require(:meetingID)
+      params.require(:callbackURL)
+      params.require(:getRaw)
+
+      begin
+        meeting = Meeting.find(params[:meetingID])
+      rescue ApplicationRedisRecord::RecordNotFound
+        # Respond with MeetingNotFoundError if the meeting could not be found
+        logger.info("The requested meeting #{params[:meetingID]} does not exist")
+        raise MeetingNotFoundError
+      end
+
+      server = meeting.server
+
+      # Construct end call with the right params
+      uri = encode_bbb_uri('hooks/create', server.url, server.secret,
+                           meetingID: params[:meetingID], callbackURL: params[:callbackURL], getRaw: params[:getRaw])
+
+      begin
+        # Send a GET request to the server
+        response = get_post_req(uri)
+      rescue BBBError => e
+        # Reraise the error
+        raise e
+      rescue StandardError => e
+        logger.warn("Error #{e} accessing meeting #{params[:meetingID]} on server #{server.id}.")
+        raise InternalError, 'Unable to access meeting on server.'
+      end
+
+      # Render response from the server
+      render(xml: response)
+  end
+
+  def hooks_destroy
+      params.require(:meetingID)
+      params.require(:hookID)
+
+      begin
+        meeting = Meeting.find(params[:meetingID])
+      rescue ApplicationRedisRecord::RecordNotFound
+        # Respond with MeetingNotFoundError if the meeting could not be found
+        logger.info("The requested meeting #{params[:meetingID]} does not exist")
+        raise MeetingNotFoundError
+      end
+
+      server = meeting.server
+
+      # Construct end call with the right params
+      uri = encode_bbb_uri('hooks/destroy', server.url, server.secret,
+                           hookID: params[:hookID])
+
+      begin
+        # Send a GET request to the server
+        response = get_post_req(uri)
+      rescue BBBError => e
+        # Reraise the error
+        raise e
+      rescue StandardError => e
+        logger.warn("Error #{e} accessing meeting #{params[:meetingID]} on server #{server.id}.")
+        raise InternalError, 'Unable to access meeting on server.'
+      end
+
+      # Render response from the server
+      render(xml: response)
+  end
+
+  def hooks_list
+      params.require(:meetingID)
+
+      begin
+        meeting = Meeting.find(params[:meetingID])
+      rescue ApplicationRedisRecord::RecordNotFound
+        # Respond with MeetingNotFoundError if the meeting could not be found
+        logger.info("The requested meeting #{params[:meetingID]} does not exist")
+        raise MeetingNotFoundError
+      end
+
+      server = meeting.server
+
+      # Construct end call with the right params
+      uri = encode_bbb_uri('hooks/list', server.url, server.secret,
+                           meetingID: params[:meetingID])
+
+      begin
+        # Send a GET request to the server
+        response = get_post_req(uri)
+      rescue BBBError => e
+        # Reraise the error
+        raise e
+      rescue StandardError => e
+        logger.warn("Error #{e} accessing meeting #{params[:meetingID]} on server #{server.id}.")
+        raise InternalError, 'Unable to access meeting on server.'
+      end
+
+      # Render response from the server
+      render(xml: response)
+  end
+
   private
 
   # Filter out unneeded params when passing through to join and create calls

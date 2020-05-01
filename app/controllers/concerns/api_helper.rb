@@ -19,9 +19,22 @@ module ApiHelper
     )
 
     # Camel case (ex) get_meetings to getMeetings to match BBB server
-    checksum = Digest::SHA1.hexdigest(action_name.camelcase(:lower) + check_string + Rails.configuration.x.loadbalancer_secret)
+    checksum = Digest::SHA1.hexdigest(get_action_url + check_string + Rails.configuration.x.loadbalancer_secret)
 
     raise ChecksumError unless ActiveSupport::SecurityUtils.fixed_length_secure_compare(checksum, params[:checksum])
+  end
+
+  def get_action_url
+      case action_name
+      when "hooks_create"
+          "hooks/create"
+      when "hooks_list"
+          "hooks/list"
+      when "hooks_destroy"
+          "hooks/destroy"
+      else
+          action_name.camelcase(:lower)
+      end
   end
 
   # Encode URI and append checksum

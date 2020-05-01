@@ -15,6 +15,9 @@ Rails.application.routes.draw do
     post 'publishRecordings', to: 'bigbluebutton_api#publish_recordings', as: :publish_recordings
     post 'updateRecordings', to: 'bigbluebutton_api#update_recordings', as: :update_recordings
     post 'deleteRecordings', to: 'bigbluebutton_api#delete_recordings', as: :delete_recordings
+    get 'hooks/create', to: 'bigbluebutton_api#hooks_create', as: :hooks_create
+    get 'hooks/destroy', to: 'bigbluebutton_api#hooks_destroy', as: :hooks_destroy
+    get 'hooks/list', to: 'bigbluebutton_api#hooks_list', as: :hooks_list
   end
 
   get 'health_check', to: 'health_check#all'

@@ -117,6 +117,7 @@ class BigBlueButtonApiController < ApplicationController
         server_meetings = response.xpath('/response/meetings/meeting')
         next if server_meetings.empty?
 
+        server_meetings.search('running').each { |n| n.after("<serverUrl>#{server.url}</serverUrl>") }
         # Add all meetings returned from the getMeetings call to the list
         meetings_node.add_child(server_meetings)
       rescue BBBError => e

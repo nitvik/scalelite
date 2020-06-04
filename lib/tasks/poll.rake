@@ -34,12 +34,16 @@ namespace :poll do
       resp = get_post_req(encode_bbb_uri('getMeetings', server.url, server.secret))
       meetings = resp.xpath('/response/meetings/meeting')
       total_user_count = 0
+      video_count = 0
       meetings.each do |meeting|
         count = meeting.at_xpath('participantCount')
         users = count.present? ? count.text.to_i : 0
         total_user_count += users
+        count2 = meeting.at_xpath('videoCount')
+        users2 = !count2.nil? ? count2.text.to_i : 0
+        video_count += users2
       end
-      server.load = total_user_count + meetings.length
+      server.load = total_user_count + (meetings.length * 15) + (video_count * 10)
       server.online = true
     rescue StandardError => e
       Rails.logger.warn("Failed to get server id=#{server.id} status: #{e}")

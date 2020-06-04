@@ -149,7 +149,7 @@ class BigBlueButtonApiController < ApplicationController
     server = meeting.server
 
     logger.debug("Incrementing server #{server.id} load by 1")
-    server.increment_load(1)
+    server.increment_load(15)
 
     duration = params[:duration].to_i
 

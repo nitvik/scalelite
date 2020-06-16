@@ -461,12 +461,87 @@ class BigBlueButtonApiController < ApplicationController
       render(xml: response)
   end
 
+  def get_servers
+      builder = Nokogiri::XML::Builder.new do |xml|
+        xml.response do
+          xml.returncode('SUCCESS')
+          xml.servers
+        end
+      end
+      all_servers = builder.doc
+      server_node = all_servers.at_xpath('/response/servers')
+
+      servers = Server.all
+      servers.each do |server|
+
+          server_xml = Nokogiri::XML::Node.new "server", server_node
+
+          server_url = Nokogiri::XML::Node.new "url", server_xml
+          server_url.content = server.url
+          server_xml.add_child(server_url)
+
+          server_load = Nokogiri::XML::Node.new "load", server_xml
+          server_load.content = server.load
+          server_xml.add_child(server_load)
+
+          server_online = Nokogiri::XML::Node.new "online", server_xml
+          server_online.content = server.online
+          server_xml.add_child(server_online)
+
+          server_enabled = Nokogiri::XML::Node.new "enabled", server_xml
+          server_enabled.content = server.enabled
+          server_xml.add_child(server_enabled)
+
+          server_node.add_child(server_xml)
+      end
+
+      render(xml: all_servers)
+  end
+
+  def disable_server
+      params.require(:serverUrl)
+
+      servers = Server.all
+      servers.each do |server|
+        if (server.url == params[:serverUrl])
+            server.enabled = false
+            server.save!
+        end
+      end
+
+      render(xml: success_response)
+  end
+
+  def enable_server
+      params.require(:serverUrl)
+
+      servers = Server.all
+      servers.each do |server|
+        if (server.url == params[:serverUrl])
+            server.enabled = true
+            server.save!
+        end
+      end
+
+      render(xml: success_response)
+  end
+
   private
 
   # Filter out unneeded params when passing through to join and create calls
   # Has to be to_unsafe_hash since to_h only accepts permitted attributes
   def pass_through_params
     params.except(:format, :controller, :action, :checksum).to_unsafe_hash
+  end
+
+  def success_response
+    Nokogiri::XML::Builder.new do |xml|
+      xml.response do
+        xml.returncode('SUCCESS')
+        xml.messageKey('Success')
+        xml.message('The request was successful')
+      end
+    end
   end
 
   # Success response if there are no meetings on any servers

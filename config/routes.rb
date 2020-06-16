@@ -18,6 +18,9 @@ Rails.application.routes.draw do
     get 'hooks/create', to: 'bigbluebutton_api#hooks_create', as: :hooks_create
     get 'hooks/destroy', to: 'bigbluebutton_api#hooks_destroy', as: :hooks_destroy
     get 'hooks/list', to: 'bigbluebutton_api#hooks_list', as: :hooks_list
+    post 'enableServer', to: 'bigbluebutton_api#enable_server', as: :enable_server
+    post 'disableServer', to: 'bigbluebutton_api#disable_server', as: :disable_server
+    post 'getServers', to: 'bigbluebutton_api#get_servers', as: :get_servers
   end
 
   get 'health_check', to: 'health_check#all'

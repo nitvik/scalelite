@@ -146,7 +146,12 @@ class BigBlueButtonApiController < ApplicationController
     meeting = Meeting.find_or_create_with_server(params[:meetingID], server)
 
     # Update with old server if meeting already existed in database
-    server = meeting.server
+    begin
+        server = meeting.server
+    rescue ApplicationRedisRecord::RecordNotFound
+        meeting.destroy!
+        meeting = Meeting.find_or_create_with_server(params[:meetingID], server)
+    end
 
     logger.debug("Incrementing server #{server.id} load by 1")
     server.increment_load(15)
